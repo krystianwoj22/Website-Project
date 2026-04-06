@@ -29,22 +29,21 @@
         <button class="shuffle-toggle" id="btn-shuffle-toggle" aria-pressed="false">
           <span class="toggle-icon">🔀</span>
           <span class="toggle-text">Shuffle <strong>OFF</strong></span>
-          <span class="toggle-pill"></span>
         </button>
       </div>
 
       <h2 class="section-title">Choose a Category</h2>
 
-      <!-- Category grid -->
+      <!-- Category grid — best score badges populated by JS -->
       <div class="category-grid">
 
-        <!-- All Cards — featured -->
         <button class="cat-card cat-all" data-category="all">
           <span class="cat-icon">⭐</span>
           <div class="cat-info">
             <span class="cat-name">All Cards</span>
             <span class="cat-count">40 cards</span>
           </div>
+          <span class="cat-best" id="cat-best-all"></span>
         </button>
 
         <button class="cat-card" data-category="Greetings">
@@ -53,6 +52,7 @@
             <span class="cat-name">Greetings</span>
             <span class="cat-count">8 cards</span>
           </div>
+          <span class="cat-best" id="cat-best-Greetings"></span>
         </button>
 
         <button class="cat-card" data-category="Animals">
@@ -61,6 +61,7 @@
             <span class="cat-name">Animals</span>
             <span class="cat-count">8 cards</span>
           </div>
+          <span class="cat-best" id="cat-best-Animals"></span>
         </button>
 
         <button class="cat-card" data-category="Colors">
@@ -69,6 +70,7 @@
             <span class="cat-name">Colors</span>
             <span class="cat-count">8 cards</span>
           </div>
+          <span class="cat-best" id="cat-best-Colors"></span>
         </button>
 
         <button class="cat-card" data-category="Everyday Words">
@@ -77,6 +79,7 @@
             <span class="cat-name">Everyday Words</span>
             <span class="cat-count">8 cards</span>
           </div>
+          <span class="cat-best" id="cat-best-Everyday-Words"></span>
         </button>
 
         <button class="cat-card" data-category="Food & Drink">
@@ -85,6 +88,7 @@
             <span class="cat-name">Food &amp; Drink</span>
             <span class="cat-count">8 cards</span>
           </div>
+          <span class="cat-best" id="cat-best-Food-Drink"></span>
         </button>
 
       </div>
@@ -98,14 +102,17 @@
   ══════════════════════════════════════ -->
   <div id="app" class="hidden">
 
-    <!-- Top bar: back button + category name + score -->
+    <!-- Top bar: back · category name · streak + score -->
     <div class="top-bar">
-      <button class="btn-back" id="btn-back" title="Change category">← Back</button>
+      <button class="btn-back" id="btn-back">← Back</button>
       <span class="top-category" id="top-category">Greetings</span>
-      <span class="top-score" id="top-score">✅ 0 &nbsp; ❌ 0</span>
+      <div class="top-right">
+        <span class="streak-display" id="streak-display" title="Current streak">🔥 0</span>
+        <span class="top-score" id="top-score">✅ 0 ❌ 0</span>
+      </div>
     </div>
 
-    <!-- Progress bar + counter -->
+    <!-- Progress bar + card counter -->
     <div class="progress-row">
       <div class="progress-bar-track">
         <div class="progress-bar-fill" id="progress-fill"></div>
@@ -113,8 +120,8 @@
       <span class="card-counter" id="card-counter">1 / 8</span>
     </div>
 
-    <!-- Flashcard -->
-    <div class="card-scene">
+    <!-- Flashcard (id on scene for animation) -->
+    <div class="card-scene" id="card-scene">
       <div class="card" id="flashcard">
 
         <div class="card-face card-front">
@@ -132,11 +139,16 @@
       </div>
     </div>
 
-    <!-- Answer buttons (appear after flip) -->
+    <!-- Answer buttons (visible after flip) -->
     <div class="answer-buttons" id="answer-buttons">
       <button class="btn btn-correct" id="btn-correct">✅ Got it!</button>
       <button class="btn btn-wrong"   id="btn-wrong">❌ Missed it</button>
     </div>
+
+    <!-- Keyboard shortcut hint -->
+    <p class="keyboard-hint">
+      <kbd>Space</kbd> flip &nbsp;·&nbsp; <kbd>→</kbd> got it &nbsp;·&nbsp; <kbd>←</kbd> missed
+    </p>
 
   </div>
 
@@ -149,13 +161,22 @@
       <div class="end-emoji" id="end-emoji">🎉</div>
       <h2 class="end-title">Session Complete!</h2>
       <p class="end-message" id="end-message">Great work!</p>
+
+      <!-- Score -->
       <div class="end-score-box">
         <span id="end-score-text">16 / 20</span>
         <span id="end-pct-text">80%</span>
       </div>
+
+      <!-- Best score comparison (new best / matched / previous best) -->
+      <p class="end-best-label" id="end-best-label"></p>
+
+      <!-- Streak highlight -->
+      <p class="end-streak" id="end-streak"></p>
+
       <div class="end-actions">
-        <button class="btn btn-restart" id="btn-restart">🔄 Try Again</button>
-        <button class="btn btn-change-cat" id="btn-change-cat">📂 Change Category</button>
+        <button class="btn btn-restart"    id="btn-restart">🔄 Try Again</button>
+        <button class="btn btn-change-cat" id="btn-change-cat">📂 Categories</button>
       </div>
     </div>
   </div>

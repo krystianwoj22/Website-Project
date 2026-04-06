@@ -2,12 +2,9 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Palette */
   --bg:           #080e1a;
   --surface:      #0f1a2e;
   --surface-2:    #162035;
-  --card-front:   #122040;
-  --card-back:    #1e1040;
   --gold:         #c9a84c;
   --gold-bright:  #f0cc72;
   --gold-glow:    rgba(201,168,76,.25);
@@ -27,7 +24,6 @@ body {
   min-height: 100vh;
 }
 
-/* ── Utility ─────────────────────────────────────────────────── */
 .hidden { display: none !important; }
 
 
@@ -41,7 +37,6 @@ body {
   flex-direction: column;
 }
 
-/* Header */
 .app-header {
   position: relative;
   text-align: center;
@@ -73,7 +68,6 @@ body {
   position: relative;
 }
 
-/* Options row (shuffle toggle) */
 .category-main {
   flex: 1;
   max-width: 640px;
@@ -82,6 +76,7 @@ body {
   padding: 0 20px 48px;
 }
 
+/* Options row */
 .options-row {
   display: flex;
   align-items: center;
@@ -99,7 +94,6 @@ body {
   color: var(--text-muted);
 }
 
-/* Shuffle toggle button */
 .shuffle-toggle {
   display: flex;
   align-items: center;
@@ -113,23 +107,17 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
-.shuffle-toggle:hover {
-  border-color: var(--gold);
-  color: var(--text);
-}
+.shuffle-toggle:hover { border-color: var(--gold); color: var(--text); }
 
-/* When shuffle is ON, highlight it in gold */
 .shuffle-toggle.active {
   background: var(--gold-glow);
   border-color: var(--gold);
   color: var(--gold-bright);
 }
 
-.toggle-icon { font-size: 1rem; }
-
-/* Section title */
 .section-title {
   font-size: 0.8rem;
   font-weight: 700;
@@ -146,12 +134,8 @@ body {
   gap: 12px;
 }
 
-/* "All Cards" spans full width */
-.cat-all {
-  grid-column: 1 / -1;
-}
+.cat-all { grid-column: 1 / -1; }
 
-/* Category card */
 .cat-card {
   display: flex;
   align-items: center;
@@ -159,7 +143,7 @@ body {
   background: var(--surface);
   border: 1.5px solid rgba(201,168,76,.12);
   border-radius: var(--radius);
-  padding: 20px 18px;
+  padding: 18px 16px;
   cursor: pointer;
   text-align: left;
   transition: all 0.22s ease;
@@ -167,7 +151,6 @@ body {
   overflow: hidden;
 }
 
-/* Subtle gold shimmer on hover */
 .cat-card::before {
   content: '';
   position: absolute;
@@ -190,39 +173,37 @@ body {
   border-color: var(--gold);
 }
 
-.cat-all:hover {
-  box-shadow: 0 10px 36px rgba(201,168,76,.25);
-}
+.cat-all:hover { box-shadow: 0 10px 36px rgba(201,168,76,.25); }
 
-.cat-icon {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-
+.cat-icon { font-size: 2rem; flex-shrink: 0; }
 .cat-all .cat-icon { font-size: 2.2rem; }
 
 .cat-info {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  flex: 1;
 }
 
-.cat-name {
-  font-size: 1rem;
+.cat-name { font-size: 1rem; font-weight: 700; color: var(--text); }
+.cat-all .cat-name { font-size: 1.1rem; color: var(--gold-bright); }
+.cat-count { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
+
+/* Best score badge on category cards */
+.cat-best {
+  font-size: 0.72rem;
   font-weight: 700;
-  color: var(--text);
+  color: var(--gold);
+  background: rgba(201,168,76,.12);
+  border: 1px solid rgba(201,168,76,.25);
+  border-radius: 99px;
+  padding: 3px 9px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  /* Hidden by default; JS sets textContent to show it */
 }
 
-.cat-all .cat-name {
-  font-size: 1.15rem;
-  color: var(--gold-bright);
-}
-
-.cat-count {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  font-weight: 500;
-}
+.cat-best:empty { display: none; }
 
 
 /* ══════════════════════════════════════════════════════════════
@@ -235,6 +216,7 @@ body {
   flex-direction: column;
   align-items: center;
   padding-bottom: 40px;
+  overflow-x: hidden; /* prevents scroll during card exit animations */
 }
 
 /* Top bar */
@@ -259,22 +241,49 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
-.btn-back:hover {
-  border-color: var(--gold);
-  color: var(--gold-bright);
-}
+.btn-back:hover { border-color: var(--gold); color: var(--gold-bright); }
 
 .top-category {
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--gold);
-  letter-spacing: 0.3px;
+}
+
+/* Right side of top bar: streak + score stacked */
+.top-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+/* 🔥 Streak counter */
+.streak-display {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+/* When streak >= 3, glow gold */
+.streak-display.hot {
+  color: var(--gold-bright);
+  text-shadow: 0 0 12px rgba(240,204,114,.6);
+  animation: streakPulse 0.5s ease;
+}
+
+@keyframes streakPulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
 }
 
 .top-score {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-muted);
   white-space: nowrap;
@@ -293,7 +302,7 @@ body {
 .progress-bar-track {
   flex: 1;
   height: 6px;
-  background: var(--surface-2);
+  background: var(--surface-2, #162035);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -324,7 +333,33 @@ body {
   margin-bottom: 24px;
 }
 
-/* Rotating wrapper */
+/* Card exit animations — triggered from JS */
+.card-scene.exit-correct {
+  animation: exitRight 0.28s ease forwards;
+  pointer-events: none;
+}
+
+.card-scene.exit-wrong {
+  animation: exitLeft 0.28s ease forwards;
+  pointer-events: none;
+}
+
+.card-scene.enter {
+  animation: enterCard 0.28s ease forwards;
+}
+
+@keyframes exitRight {
+  to { opacity: 0; transform: translateX(80px) scale(0.88); }
+}
+@keyframes exitLeft {
+  to { opacity: 0; transform: translateX(-80px) scale(0.88); }
+}
+@keyframes enterCard {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* The rotating card wrapper */
 .card {
   width: 100%;
   height: 100%;
@@ -336,7 +371,6 @@ body {
 
 .card.flipped { transform: rotateY(180deg); }
 
-/* Both faces */
 .card-face {
   position: absolute;
   inset: 0;
@@ -355,18 +389,14 @@ body {
 .card-front {
   background: linear-gradient(145deg, #1a3255, #0d1e38);
   border: 1.5px solid rgba(201,168,76,.35);
-  box-shadow:
-    0 12px 48px rgba(0,0,0,.5),
-    inset 0 1px 0 rgba(201,168,76,.15);
+  box-shadow: 0 12px 48px rgba(0,0,0,.5), inset 0 1px 0 rgba(201,168,76,.15);
 }
 
-/* Back — deep purple/indigo */
+/* Back — deep purple */
 .card-back {
   background: linear-gradient(145deg, #22144a, #130c30);
   border: 1.5px solid rgba(168,189,208,.25);
-  box-shadow:
-    0 12px 48px rgba(0,0,0,.5),
-    inset 0 1px 0 rgba(168,189,208,.1);
+  box-shadow: 0 12px 48px rgba(0,0,0,.5), inset 0 1px 0 rgba(168,189,208,.1);
   transform: rotateY(180deg);
 }
 
@@ -397,11 +427,7 @@ body {
 
 .card-front .word { color: var(--gold-bright); }
 
-.flip-hint {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  letter-spacing: 0.3px;
-}
+.flip-hint { font-size: 0.78rem; color: var(--text-muted); }
 
 /* ── Answer Buttons ─────────────────────────────────────────── */
 .answer-buttons {
@@ -461,6 +487,27 @@ body {
   filter: brightness(1.1);
 }
 
+/* ── Keyboard hint ──────────────────────────────────────────── */
+.keyboard-hint {
+  margin-top: 16px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  opacity: 0.6;
+  text-align: center;
+}
+
+kbd {
+  display: inline-block;
+  padding: 2px 7px;
+  font-size: 0.72rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 700;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 5px;
+  color: var(--silver);
+}
+
 
 /* ══════════════════════════════════════════════════════════════
    SCREEN 3 — End / Results
@@ -482,7 +529,7 @@ body {
   background: var(--surface);
   border: 1.5px solid rgba(201,168,76,.25);
   border-radius: 24px;
-  padding: 52px 40px;
+  padding: 48px 40px;
   text-align: center;
   max-width: 420px;
   width: 100%;
@@ -490,19 +537,8 @@ body {
 }
 
 .end-emoji { font-size: 4rem; margin-bottom: 16px; }
-
-.end-title {
-  font-size: 1.8rem;
-  font-weight: 800;
-  margin-bottom: 10px;
-  color: var(--text);
-}
-
-.end-message {
-  font-size: 1rem;
-  color: var(--text-muted);
-  margin-bottom: 20px;
-}
+.end-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
+.end-message { font-size: 1rem; color: var(--text-muted); margin-bottom: 20px; }
 
 .end-score-box {
   display: inline-flex;
@@ -512,26 +548,40 @@ body {
   border: 1px solid rgba(201,168,76,.25);
   border-radius: var(--radius-sm);
   padding: 14px 28px;
-  margin-bottom: 32px;
+  margin-bottom: 14px;
 }
 
-#end-score-text {
-  font-size: 1.8rem;
-  font-weight: 800;
+#end-score-text { font-size: 1.8rem; font-weight: 800; color: var(--gold-bright); }
+#end-pct-text   { font-size: 1rem; font-weight: 700; color: var(--gold); opacity: 0.75; }
+
+/* Best score comparison line */
+.end-best-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  min-height: 1.2em;
+}
+
+.end-best-label.new-best {
   color: var(--gold-bright);
 }
 
-#end-pct-text {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--gold);
-  opacity: 0.75;
+.end-best-label.prev-best {
+  color: var(--text-muted);
 }
 
-.end-actions {
-  display: flex;
-  gap: 12px;
+/* Streak highlight line */
+.end-streak {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+  min-height: 1.2em;
 }
+
+.end-streak.hot { color: var(--gold); }
+
+.end-actions { display: flex; gap: 12px; }
 
 .btn-restart {
   flex: 1;
@@ -567,19 +617,17 @@ body {
   font-family: 'Inter', system-ui, sans-serif;
 }
 
-.btn-change-cat:hover {
-  border-color: var(--gold);
-  color: var(--gold-bright);
-}
+.btn-change-cat:hover { border-color: var(--gold); color: var(--gold-bright); }
 
 
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 480px) {
-  .app-header h1      { font-size: 2.1rem; }
-  .category-grid      { grid-template-columns: 1fr; }
-  .cat-all            { grid-column: 1; }
-  .word               { font-size: 2rem; }
-  .end-card           { padding: 36px 22px; }
-  .end-actions        { flex-direction: column; }
-  .card-scene         { height: 260px; }
+  .app-header h1         { font-size: 2.1rem; }
+  .category-grid         { grid-template-columns: 1fr; }
+  .cat-all               { grid-column: 1; }
+  .word                  { font-size: 2rem; }
+  .end-card              { padding: 36px 22px; }
+  .end-actions           { flex-direction: column; }
+  .card-scene            { height: 260px; }
+  .keyboard-hint         { display: none; } /* hidden on touch devices */
 }
