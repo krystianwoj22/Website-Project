@@ -1,48 +1,17 @@
-import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { createServer as createViteServer } from 'vite';
+const express = require('express');
+const path    = require('path');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const app  = express();
+const PORT = process.env.PORT || 3000;
 
-async function startServer() {
-  const app = express();
-  // Hostinger Node.js environments usually provide process.env.PORT
-  const PORT = process.env.PORT || 3000;
+// Serve everything inside the /public folder as static files
+app.use(express.static(path.join(__dirname, 'public')));
 
-  // Add API routes here
-  app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok' });
-  });
+// Catch-all: for any route not matched, return index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
-  // Determine environment
-  const isProduction = process.env.NODE_ENV === 'production';
-
-  if (!isProduction) {
-    // Development mode with Vite
-    console.log('Starting in Development Mode');
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    // Production mode - serve static files from 'public' folder
-    // Note: Vite will be configured to output its build to the 'public' folder
-    console.log('Starting in Production Mode');
-    const publicPath = path.join(__dirname, 'public');
-    
-    app.use(express.static(publicPath));
-
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(publicPath, 'index.html'));
-    });
-  }
-
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
-
-startServer();
+app.listen(PORT, () => {
+  console.log(`FlashEspañol is running → http://localhost:${PORT}`);
+});
