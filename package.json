@@ -4,12 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "node server.js",
     "start": "node server.js",
-    "serve": "npm run build && node server.js",
-    "clean": "rm -rf dist",
+    "build": "vite build",
+    "preview": "NODE_ENV=production node server.js",
+    "clean": "rm -rf public",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
