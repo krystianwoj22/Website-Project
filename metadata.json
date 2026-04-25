@@ -1,6 +1,6 @@
 {
-  "name": "Claude Creator Catalyst",
-  "description": "YouTube video idea generator for Claude AI educators with thumbnail concepts and view potential.",
+  "name": "Nano Banana Image Generator",
+  "description": "A dark-themed image generator using Gemini Nano Banana (Imagen) models with prompt enhancement and a shared gallery.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }

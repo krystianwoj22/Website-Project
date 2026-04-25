@@ -1,46 +1,68 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getAuth, signInAnonymously } from 'firebase/auth';
+import { 
+  getFirestore, 
+  doc, 
+  getDocFromServer,
+  collection,
+  query,
+  orderBy,
+  onSnapshot
+} from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
-export const googleProvider = new GoogleAuthProvider();
+export const auth = getAuth(app);
+
+// Initialize anonymous auth for session persistence if not logged in
+signInAnonymously(auth).catch(err => console.error("Anonymous auth failed", err));
+
+export enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
 
 export interface FirestoreErrorInfo {
   error: string;
-  operationType: 'create' | 'update' | 'delete' | 'list' | 'get' | 'write';
+  operationType: OperationType;
   path: string | null;
   authInfo: {
-    userId: string;
-    email: string;
-    emailVerified: boolean;
-    isAnonymous: boolean;
-    providerInfo: { providerId: string; displayName: string; email: string; }[];
+    userId?: string | null;
+    email?: string | null;
+    emailVerified?: boolean | null;
+    isAnonymous?: boolean | null;
   }
 }
 
-export function handleFirestoreError(err: any, operation: FirestoreErrorInfo['operationType'], path: string | null = null): never {
-  if (err.code === 'permission-denied' || err.message?.includes('insufficient permissions')) {
-    const user = auth.currentUser;
-    const info: FirestoreErrorInfo = {
-      error: err.message,
-      operationType: operation,
-      path,
-      authInfo: {
-        userId: user?.uid || 'unauthenticated',
-        email: user?.email || '',
-        emailVerified: user?.emailVerified || false,
-        isAnonymous: user?.isAnonymous || false,
-        providerInfo: user?.providerData.map(p => ({
-          providerId: p.providerId,
-          displayName: p.displayName || '',
-          email: p.email || ''
-        })) || []
-      }
-    };
-    throw new Error(JSON.stringify(info));
+export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: auth.currentUser?.uid,
+      email: auth.currentUser?.email,
+      emailVerified: auth.currentUser?.emailVerified,
+      isAnonymous: auth.currentUser?.isAnonymous,
+    },
+    operationType,
+    path
   }
-  throw err;
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  throw new Error(JSON.stringify(errInfo));
 }
+
+// Test connection
+async function testConnection() {
+  try {
+    await getDocFromServer(doc(db, 'test', 'connection'));
+  } catch (error) {
+    if(error instanceof Error && error.message.includes('the client is offline')) {
+      console.error("Please check your Firebase configuration.");
+    }
+  }
+}
+testConnection();
